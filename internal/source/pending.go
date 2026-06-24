@@ -1,3 +1,5 @@
+// Copyright 2026 Hitesh Kumar Sahu — https://hiteshsahu.com
+// SPDX-License-Identifier: Apache-2.0
 package source
 
 // Pending is a human translation of a Slurm pending Reason code.

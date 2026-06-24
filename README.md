@@ -56,6 +56,9 @@ Requires **Go 1.22+**.
     
     # Run the Engine
     go run .
+    
+    # Optional : Build & format before commit
+    gofmt -w . && go build ./...
 ```
 
 ![Squint](./img/result.jpeg)

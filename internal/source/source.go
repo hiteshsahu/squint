@@ -1,3 +1,5 @@
+// Copyright 2026 Hitesh Kumar Sahu — https://hiteshsahu.com
+// SPDX-License-Identifier: Apache-2.0
 package source
 
 import (
@@ -129,8 +131,8 @@ func (m *Mock) Snapshot(ctx context.Context) (*model.Snapshot, error) {
 
 type Live struct{}
 
-func NewLive() *Live          { return &Live{} }
-func (l *Live) Name() string  { return "live" }
+func NewLive() *Live         { return &Live{} }
+func (l *Live) Name() string { return "live" }
 func (l *Live) Snapshot(ctx context.Context) (*model.Snapshot, error) {
 	return nil, errString("live source not implemented yet — see internal/source/source.go")
 }
