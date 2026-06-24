@@ -1,0 +1,109 @@
+# Binaries
+bin/
+dist/
+build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go
+*.test
+*.out
+coverage.out
+coverage.txt
+cover.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Vendor (uncomment if you don't commit vendor)
+/vendor/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Test artifacts
+test-results/
+coverage/
+benchmark-results/
+
+# Generated screenshots
+screenshots/
+*.png.tmp
+*.jpg.tmp
+
+# TUI recordings / demos
+asciinema/
+recordings/
+
+# Local configuration
+config.local.yaml
+config.local.yml
+config.local.json
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+
+# Build artifacts
+release/
+artifacts/
+
+# Node (future web dashboard)
+node_modules/
+.next/
+out/
+dist-web/
+
+# Generated documentation
+docs/generated/
+
+# JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Air (hot reload)
+.air/
+
+# Delve debugger
+__debug_bin
+
+# Profiling
+*.prof
+cpu.prof
+mem.prof
+trace.out
