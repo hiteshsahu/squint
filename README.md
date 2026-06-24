@@ -8,7 +8,7 @@
 
 It's read-only by design: it only ever runs `squeue` / `sacct` / `scontrol` and reads DCGM. Nothing to trust it with, nothing it can break. Point it at a cluster and look.
 
-### Install
+### ⚙️ Install
 
 ```bash
     # Install Squint
@@ -18,23 +18,22 @@ It's read-only by design: it only ever runs `squeue` / `sacct` / `scontrol` and 
 
 ```
 
-### Run
+[![🛠️ Build & Test](https://github.com/hiteshsahu/Squint/actions/workflows/ci.yaml/badge.svg)](https://github.com/hiteshsahu/Squint/actions/workflows/ci.yaml)
+
+### ▶️ Run
 
 No cluster handy? It ships with a mock source, so `squint` runs on your laptop out of the box.
 
 
 ```bash
-squint          # mock data — runs anywhere
-squint --live   # read your real Slurm cluster
+    squint          # mock data — runs anywhere
+    squint --live   # read your real Slurm cluster
 
 ```
 Keys: 
 - <kbd>q</kbd> quit 
 - <kbd>r</kbd> refresh (auto refresh every 2s)
 - <kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>PgUp</kbd>/<kbd>PgDn</kbd>/wheel to scroll. 
-
-
-
 
 ---
 
@@ -60,17 +59,19 @@ That's the "who's squatting?" view every platform team wants and no Slurm tool g
 
 ---
 
-## DEVELOP
+## 👨‍💻 DEVELOP
 
 - Requires **Go 1.22+**
 
-###  Install dependencies
+###  ⚙️ Install dependencies
 ```bash
     # Install dependencies
     go mod tidy
 ```
 
-###  Build & Test
+###  🧪 Build & Test
+
+Tests are run as part of CI itself.
     
  ```bash  
     # Optional : Build & format before commit
@@ -87,7 +88,7 @@ That's the "who's squatting?" view every platform team wants and no Slurm tool g
 
 ```
 
-### Run 
+### ▶️ Run 
 
 
 ``` bash
@@ -105,9 +106,7 @@ Keys: `q` quit · `r` refresh. Polls every 2s.
 
 ---
 
-
 ## How Squint is Built
-
 
 
 ```text
@@ -138,8 +137,7 @@ Keys: `q` quit · `r` refresh. Polls every 2s.
     
 ```
 
-Folder structure
-
+## 📁 Folder structure
 
 The Source interface is the whole seam: Mock and Live both implement it, and the TUI never knows which one it's talking to.
 
@@ -222,7 +220,7 @@ The `Source` interface is the whole seam:
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
 `squint` grows up one rung at a time — each earns the right to the next.
 
