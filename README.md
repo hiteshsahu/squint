@@ -3,6 +3,7 @@
 **A GPU-aware Slurm monitor for your terminal. Read-only, zero-config, runs anywhere.**
 
 ![](./img/cover.png)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
 It's read-only by design: it only ever runs `squeue` / `sacct` / `scontrol` and reads DCGM. Nothing to trust it with, nothing it can break. Point it at a cluster and look.
