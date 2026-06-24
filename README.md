@@ -1,6 +1,6 @@
 # Squint 🦝🐾
 
-**A GPU-aware Slurm monitor for your terminal. Read-only, zero-config, runs anywhere.**
+> ## **Squint is a GPU-aware Slurm monitor for your terminal. Read-only, zero-config, runs anywhere.**
 
 ![](./img/cover.png)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
