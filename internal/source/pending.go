@@ -7,8 +7,11 @@ type Pending struct {
 }
 
 // Explain turns squeue's cryptic Reason field into something a human can act
-// on. This is one of squint's two flagship L0 features — the other is the
-// idle-GPU heatmap. New codes are cheap to add; keep them short and actionable.
+// on.
+//  This is one of squint's two flagship L0 features — the other is the
+// idle-GPU heatmap. 
+// 
+// New codes are cheap to add; keep them short and actionable.
 func Explain(reason string) Pending {
 	switch reason {
 	case "Resources":

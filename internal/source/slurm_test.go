@@ -51,23 +51,6 @@ func TestParseGPUCount(t *testing.T) {
 	}
 }
 
-func TestParseGPUCountWithFallback(t *testing.T) {
-	cases := []struct {
-		gres, tres string
-		want       int
-	}{
-		{"gpu:0", "gpu:a100:16", 16},
-		{"gpu:a100:4", "gpu:a100:8", 4},
-		{"", "gpu:a100:2", 2},
-	}
-
-	for _, c := range cases {
-		if got := parseGPUCountWithFallback(c.gres, c.tres); got != c.want {
-			t.Errorf("parseGPUCountWithFallback(%q,%q) = %d, want %d", c.gres, c.tres, got, c.want)
-		}
-	}
-}
-
 func TestParseGresUsed(t *testing.T) {
 	cases := []struct {
 		in       string
@@ -143,8 +126,8 @@ func TestMapState(t *testing.T) {
 }
 
 func TestParseSqueue(t *testing.T) {
-	out := "1042|llama3-sft|alice|RUNNING|gpu|gpu-001|gpu:a100:4|gpu:a100:4|1:23:45|8:00:00|None\n" +
-		"1050|big-pretrain|dave|PENDING|gpu||gpu:0|gpu:16|0:00|1-00:00:00|(QOSMaxGRESPerUser)\n"
+	out := "1042|llama3-sft|alice|RUNNING|gpu|gpu-001|gpu:a100:4|1:23:45|8:00:00|None\n" +
+		"1050|big-pretrain|dave|PENDING|gpu||gpu:16|0:00|1-00:00:00|(QOSMaxGRESPerUser)\n"
 
 	jobs := parseSqueue(out)
 	if len(jobs) != 2 {

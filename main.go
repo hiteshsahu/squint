@@ -30,10 +30,7 @@ func main() {
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion())
 	if _, err := program.Run(); err != nil {
-		_, err := fmt.Fprintln(os.Stderr, "squint:", err)
-		if err != nil {
-			return
-		}
+		fmt.Fprintln(os.Stderr, "squint:", err)
 		os.Exit(1)
 	}
 }
