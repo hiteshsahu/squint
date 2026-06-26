@@ -39,6 +39,11 @@ Keys:
 
 ## Why squint
 
+> Because cluster state is often hidden behind pages of `squeue` output.
+
+Squint turns that into something you can understand at a glance.
+
+
 Slurm is powerful but feels like infrastructure from another era `squeue` is hard to read, "why is my job pending?" is a dark art, and nothing shows you what the GPUs are *actually doing*. `squint` is the live, GPU-native view of your cluster, in your shell, right now.
 
 Two things nothing else in the Slurm ecosystem does well:
@@ -74,8 +79,8 @@ That's the "who's squatting?" view every platform team wants and no Slurm tool g
 Tests are run as part of CI itself.
     
  ```bash  
-    # Optional : Build & format before commit
-    gofmt -w . && go build ./...
+    # Build 
+    go build ./...
     
     # Formatting go file
     gofmt -w . 
@@ -83,18 +88,25 @@ Tests are run as part of CI itself.
     # Linting
     go vet ./... 
     
-    # recursively compiles all packages
-    go build ./...   
-
 ```
 
 ### ▶️ Run 
 
+###  Mock Run
+- Run with mock gpu data
+- Any Machine: **macOS, Windows, Linux**
 
 ``` bash
-    # Run the Engine
-    go run .                 # mock
-    go run . --live          # real cluster
+    go run .
+```
+
+### Live SLURM Run
+- Run with Real GPU data 
+- SLURM must be installed — squeue/scontrol/slurmd/munge present.
+- Only **Linux** or **Winodws with WSL**
+
+``` bash                    
+    go run . --live          # Run with real Slurm
     
 ```
 
@@ -243,6 +255,14 @@ The `Source` interface is the whole seam:
 - **L3 — API** — a friendly daemon over Slurm with a real job-state event stream.
 
 It also emits Prometheus metrics, so it can feed a longer-term observability stack rather than replace one.
+
+---
+
+## Contributing
+
+Issues, ideas, and pull requests are welcome.
+
+If Squint helped you understand your cluster a little faster, consider giving the project a ⭐.
 
 ---
 
