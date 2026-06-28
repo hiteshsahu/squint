@@ -2,13 +2,16 @@
 
 > ## **Squint is a GPU-aware Slurm monitor for your terminal. Read-only, zero-config, runs anywhere.**
 
-![](./img/cover.png)
+
+![Squint Cover](./img/cover.png)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
 It's read-only by design: it only ever runs `squeue` / `scontrol`, plus `nvidia-smi` for GPU telemetry (DCGM next). Nothing to trust it with, nothing it can break. Point it at a cluster and look.
 
 ### ⚙️ Install
+[![🚀 Release](https://github.com/hiteshsahu/squint/actions/workflows/release.yaml/badge.svg)](https://github.com/hiteshsahu/squint/actions/workflows/release.yaml)
+[![🛠️ Build & Test](https://github.com/hiteshsahu/squint/actions/workflows/build-test.yaml/badge.svg)](https://github.com/hiteshsahu/squint/actions/workflows/build-test.yaml)
 
 ```bash
     # Install Squint
@@ -18,12 +21,9 @@ It's read-only by design: it only ever runs `squeue` / `scontrol`, plus `nvidia-
 
 ```
 
-[![🛠️ Build & Test](https://github.com/hiteshsahu/Squint/actions/workflows/ci.yaml/badge.svg)](https://github.com/hiteshsahu/Squint/actions/workflows/ci.yaml)
-
 ### ▶️ Run
 
 No cluster handy? It ships with a mock source, so `squint` runs on your laptop out of the box.
-
 
 ```bash
     squint          # mock data — runs anywhere
