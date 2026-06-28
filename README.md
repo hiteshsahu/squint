@@ -6,7 +6,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 
-It's read-only by design: it only ever runs `squeue` / `sacct` / `scontrol` and reads DCGM. Nothing to trust it with, nothing it can break. Point it at a cluster and look.
+It's read-only by design: it only ever runs `squeue` / `scontrol`, plus `nvidia-smi` for GPU telemetry (DCGM next). Nothing to trust it with, nothing it can break. Point it at a cluster and look.
 
 ### ⚙️ Install
 
@@ -34,6 +34,25 @@ Keys:
 - <kbd>q</kbd> quit 
 - <kbd>r</kbd> refresh (auto refresh every 2s)
 - <kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>PgUp</kbd>/<kbd>PgDn</kbd>/wheel to scroll. 
+
+No real cluster to point `--live` at? [Caravan](https://github.com/hiteshsahu/caravan) bundles a real local Slurm cluster (controller + GPU compute nodes) into one CLI — no HPC access needed. `--live` needs `squeue`/`scontrol` on the machine it runs on, so build for Linux and run squint inside the controller container:
+
+**macOS / Linux**
+```bash
+    caravan cluster up                         # build + start a local Slurm cluster in Docker/Podman
+    GOOS=linux GOARCH=amd64 go build -o squint.linux .
+    docker cp squint.linux slurmctld:/usr/local/bin/squint
+    docker exec -it slurmctld squint --live
+```
+
+**Windows (PowerShell)**
+```powershell
+    .\caravan.exe cluster up
+    $env:GOOS = "linux"; $env:GOARCH = "amd64"; go build -o squint.linux .
+    docker cp squint.linux slurmctld:/usr/local/bin/squint
+    docker exec -it slurmctld squint --live
+```
+
 
 ---
 
@@ -137,27 +156,27 @@ go tool cover -func=coverage.out
 ```text
 
             ┌────────────────────────────────────────────┐
-            │                 Squint CLI                 │
-            │     submit • status • logs • dashboard     │
+            │                 Squint TUI                 │
+            │   GPU heatmap • jobs panel • dashboard     │
             └──────────────────┬─────────────────────────┘
                                │
                                ▼
             ┌────────────────────────────────────────────┐
             │              Source Layer                  │
-            │  Mock Source • Slurm Source • Future APIs  │
+            │     Mock Source  •  Live Source            │
             └──────────────────┬─────────────────────────┘
                                │
                                ▼
             ┌────────────────────────────────────────────┐
-            │             Scheduler Engine               │
-            │  Queue Analysis • Pending Explanation      │
-            │  GPU Allocation Insights                   │
+            │           Queue & GPU Insights              │
+            │  Pending-Reason Translation                │
+            │  Job → Node → GPU Allocation                │
             └──────────────────┬─────────────────────────┘
                                │
                                ▼
             ┌────────────────────────────────────────────┐
             │                  Slurm                     │
-            │  squeue • sacct • sinfo • slurmrestd       │
+            │      squeue • scontrol • nvidia-smi        │
             └────────────────────────────────────────────┘
             
 ```
@@ -169,77 +188,30 @@ The Source interface is the whole seam: Mock and Live both implement it, and the
 ```bash
 
 squint/
-    ├── cmd/
-    │   └── squint/
-    │       └── main.go                 # CLI entrypoint
+    ├── main.go                         # CLI entrypoint (--live flag, Bubble Tea program)
     ├── internal/
-    │   ├── config/
-    │   │   └── config.go               # config loading and defaults
-    │   │
     │   ├── model/
-    │   │   ├── job.go
-    │   │   ├── node.go
-    │   │   ├── gpu.go
-    │   │   └── snapshot.go
+    │   │   └── types.go                # Job, GPU, Node, Snapshot
     │   │
     │   ├── source/
-    │   │   ├── source.go               # Source interface . Mock (runs anywhere) · Live (stub)
-    │   │   ├── mock/
-    │   │   │   └── source.go           # local demo data
-    │   │   └── slurm/
-    │   │       ├── jobs.go
-    │   │       ├── nodes.go
-    │   │       ├── gpu.go
-    │   │       └── pending.go          # Slurm reason-code → plain-English translator
+    │   │   ├── source.go               # Source interface + Mock (runs anywhere)
+    │   │   ├── live.go                 # Live: squeue/scontrol + job→node→GPU attribution
+    │   │   ├── slurm.go                # squeue/scontrol output parsing
+    │   │   ├── pending.go              # Slurm reason-code → plain-English translator
+    │   │   └── telemetry.go            # nvidia-smi GPU telemetry
     │   │
-    │   ├── collector/
-    │   │   ├── jobs.go
-    │   │   ├── nodes.go
-    │   │   └── metrics.go
-    │   │
-    │   ├── scheduler/
-    │   │   └── explain.go              # "why is my job pending?"
-    │   │
-    │   ├── tui/
-    │   │   ├── app.go                 # Bubble Tea model: poll, fetch, keys
-    │   │   ├── view.go                # Lip Gloss rendering: heatmap + jobs panel
-    │   │   ├── keymap.go
-    │   │   └── theme.go
-    │   │
-    │   └── api/
-    │       ├── server.go
-    │       └── handlers.go
-    │
-    ├── web/
-    │   └── dashboard/                  # future React/Next.js UI
-    │
-    ├── examples/
-    │   ├── train.yaml
-    │   ├── inference.yaml
-    │   └── gpu-burn.yaml
-    │
-    ├── assets/
-    │   ├── banner.png
-    │   └── screenshots/
-    │
-    ├── docs/
-    │   ├── architecture.md
-    │   ├── slurm-integration.md
-    │   └── pending-reasons.md
-    │
-    ├── .github/
-    │   └── workflows/
+    │   └── tui/
+    │       ├── app.go                  # Bubble Tea model: poll, fetch, keys
+    │       └── view.go                 # Lip Gloss rendering: heatmap + jobs panel
     │
     ├── go.mod
     ├── README.md
-    └── LICENSE  
-      
-      
+    └── LICENSE
 ```
 
 The `Source` interface is the whole seam: 
-- `Mock` today, 
-- `Live` (squeue/sacct/scontrol `--json` + `dcgmi`, with an `nvidia-smi` fallback) next. 
+- `Mock` — deterministic demo data, runs anywhere, no Slurm needed.
+- `Live` — real `squeue`/`scontrol`, plus `nvidia-smi` telemetry when available (DCGM next).
 - The TUI never knows the difference.
 
 

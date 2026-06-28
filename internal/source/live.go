@@ -50,26 +50,54 @@ func (l *Live) Snapshot(ctx context.Context) (*model.Snapshot, error) {
 }
 
 func assignJobsToNodes(jobs []model.Job, nodes []model.Node) {
-	nodeJobs := map[string][]string{}
+	nodeJobs := map[string][]model.Job{}
 	for _, node := range nodes {
 		for _, job := range jobs {
 			if job.State != model.Running {
 				continue
 			}
 			if jobRunsOnNode(job, node.Name) {
-				nodeJobs[node.Name] = append(nodeJobs[node.Name], job.ID)
+				nodeJobs[node.Name] = append(nodeJobs[node.Name], job)
 			}
 		}
 	}
 
 	for ni := range nodes {
-		if len(nodeJobs[nodes[ni].Name]) != 1 {
+		jobsHere := nodeJobs[nodes[ni].Name]
+		if len(jobsHere) == 0 {
 			continue
 		}
-		jobID := nodeJobs[nodes[ni].Name][0]
-		for gi := range nodes[ni].GPUs {
-			if nodes[ni].GPUs[gi].Allocated() {
-				nodes[ni].GPUs[gi].JobID = jobID
+
+		anyAllocated := false
+		for _, g := range nodes[ni].GPUs {
+			if g.Allocated() {
+				anyAllocated = true
+				break
+			}
+		}
+
+		if anyAllocated {
+			// scontrol's GresUsed already told us which GPUs are in use;
+			// attribute them to the job if it's the only one on this node.
+			if len(jobsHere) == 1 {
+				for gi := range nodes[ni].GPUs {
+					if nodes[ni].GPUs[gi].Allocated() {
+						nodes[ni].GPUs[gi].JobID = jobsHere[0].ID
+					}
+				}
+			}
+			continue
+		}
+
+		// scontrol reported no GresUsed at all — common on clusters with no
+		// slurmdbd, where Slurm won't track non-default TRES like gres/gpu.
+		// Derive allocation from each job's own GPU request instead of
+		// leaving every GPU looking free.
+		idx := 0
+		for _, job := range jobsHere {
+			for n := 0; n < job.GPUReq && idx < len(nodes[ni].GPUs); n++ {
+				nodes[ni].GPUs[idx].JobID = job.ID
+				idx++
 			}
 		}
 	}

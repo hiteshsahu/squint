@@ -199,6 +199,52 @@ func TestAssignJobsToNodes(t *testing.T) {
 	}
 }
 
+func TestAssignJobsToNodes_NoGresUsed(t *testing.T) {
+	// scontrol reported no GresUsed at all (e.g. no slurmdbd on the cluster),
+	// so every GPU starts unallocated; allocation must be derived from GPUReq.
+	jobs := []model.Job{
+		{ID: "300", State: model.Running, Nodes: []string{"c1"}, GPUReq: 2},
+		{ID: "400", State: model.Running, Nodes: []string{"c2"}, GPUReq: 4},
+	}
+	nodes := []model.Node{
+		{Name: "c1", GPUs: make([]model.GPU, 4)},
+		{Name: "c2", GPUs: make([]model.GPU, 4)},
+	}
+
+	assignJobsToNodes(jobs, nodes)
+
+	wantC1 := []string{"300", "300", "", ""}
+	for i, g := range nodes[0].GPUs {
+		if g.JobID != wantC1[i] {
+			t.Errorf("c1 GPU %d jobID = %q, want %q", i, g.JobID, wantC1[i])
+		}
+	}
+	for i, g := range nodes[1].GPUs {
+		if g.JobID != "400" {
+			t.Errorf("c2 GPU %d jobID = %q, want 400", i, g.JobID)
+		}
+	}
+}
+
+func TestAssignJobsToNodes_NoGresUsedMultipleJobsShareNode(t *testing.T) {
+	jobs := []model.Job{
+		{ID: "1", State: model.Running, Nodes: []string{"c1"}, GPUReq: 1},
+		{ID: "2", State: model.Running, Nodes: []string{"c1"}, GPUReq: 2},
+	}
+	nodes := []model.Node{
+		{Name: "c1", GPUs: make([]model.GPU, 4)},
+	}
+
+	assignJobsToNodes(jobs, nodes)
+
+	want := []string{"1", "2", "2", ""}
+	for i, g := range nodes[0].GPUs {
+		if g.JobID != want[i] {
+			t.Errorf("GPU %d jobID = %q, want %q", i, g.JobID, want[i])
+		}
+	}
+}
+
 func TestParseScontrolNodes(t *testing.T) {
 	out := "NodeName=gpu-001 State=MIXED Gres=gpu:a100:8 GresUsed=gpu:a100:3(IDX:0-2) Partitions=gpu\n" +
 		"NodeName=login-01 State=IDLE Gres=(null) GresUsed=gpu:0\n"
